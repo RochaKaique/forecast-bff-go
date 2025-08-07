@@ -1,0 +1,63 @@
+# Go build artifacts
+/bin/
+/build/
+/dist/
+/out/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.o
+*.a
+
+# Go module and workspace files
+/vendor/
+go.work
+go.work.sum
+
+# Go coverage and profiling
+*.coverprofile
+*.cover
+*.cov
+*.gcda
+*.gcno
+*.gcov
+*.prof
+coverage.*
+
+# Test outputs and logs
+*.log
+*.tmp
+*.err
+*.pid
+*.bench
+*.result
+*.data
+
+# Editor and IDE settings
+.vscode/
+.history/
+.idea/
+
+# OS-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+*~
+.nfs*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Personal and sensitive files
+.env
+*.local
+*.secret
+*.key
+*.pem
+*.crt
+*.cert
