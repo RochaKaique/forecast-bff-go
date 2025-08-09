@@ -22,7 +22,7 @@ func NewConfiguration() (*viper.Viper, error) {
 
 	viper.WatchConfig()
 
-	viper.OnConfigChange(func(e fsnotify.Event){
+	viper.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("Configuration changed:", e.Name)
 	})
 

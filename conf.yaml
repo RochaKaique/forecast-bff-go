@@ -1,2 +1,8 @@
 application:
   name: forecast-api
+
+server:
+  port: :9001
+
+coordinates:
+  uri: https://nominatim.openstreetmap.org

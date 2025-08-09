@@ -2,42 +2,53 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/RochaKaique/forecastgo/cmd/server"
 )
 
 func main() {
-	ctx := context.Background()
-
-	configs, err := server.NewConfiguration()
+	start := time.Now()
+	cfg, err := server.NewConfiguration()
 	if err != nil {
 		log.Fatal(err)
 	}
+	configureLog(cfg.GetString("application.name"))
 
-	srv := server.CreateServer(configs)
-	ConfigureLog(configs.GetString("application.name"))
+	srv := server.CreateServer(cfg)
 
-	srv.Start()
+	ctx, stop := signal.NotifyContext(context.Background(),
+		os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
+	slog.Info("application started",
+		"startup_time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()),
+		"port", cfg.GetString("server.port"))
 
-	<-quit
+	errCh := make(chan error, 1)
+	go func() { errCh <- srv.Start() }()
 
-	slog.WarnContext(ctx, "received Interrupt signal... shutting down server")
+	select {
+	case <-ctx.Done():
+		slog.Warn("received shutdown signal, shutting down...")
+	case err := <-errCh:
+		if err != nil {
+			slog.Error("server stopped with error", "err", err)
+		}
+	}
 
-	ctx, cancelFn := context.WithTimeout(ctx, 5*time.Second)
-	defer cancelFn()
-
-	srv.Shutdown(ctx)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	srv.Shutdown(shutdownCtx)
 }
 
-func ConfigureLog(appName string) {
+func configureLog(appName string) {
 	serverName, _ := os.Hostname()
 
 	handlerLevel := slog.LevelInfo
