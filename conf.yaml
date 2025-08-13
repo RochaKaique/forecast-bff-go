@@ -5,4 +5,4 @@ server:
   port: :9001
 
 coordinates:
-  uri: https://nominatim.openstreetmap.org
+  url: https://nominatim.openstreetmap.org

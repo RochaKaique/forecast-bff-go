@@ -10,10 +10,11 @@ import (
 func GetForecast(http *coordinates.CoordinatesClient) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		zipcode := c.Params("zipcode")
-		resp, err := http.GetCoordinates(c.UserContext(), zipcode)
+		coordinates, err := http.GetCoordinates(c.UserContext(), zipcode)
 		if err != nil {
 			log.Fatal(err)
 		}
-		return c.Status(fiber.StatusAccepted).JSON(resp)
+		return c.Status(fiber.StatusAccepted).JSON(coordinates)
 	}
 }
+
