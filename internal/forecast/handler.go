@@ -1,8 +1,6 @@
 package forecast
 
 import (
-	"log"
-
 	"github.com/RochaKaique/forecastgo/internal/coordinates"
 	"github.com/gofiber/fiber/v2"
 )
@@ -12,9 +10,8 @@ func GetForecast(http *coordinates.CoordinatesClient) fiber.Handler {
 		zipcode := c.Params("zipcode")
 		coordinates, err := http.GetCoordinates(c.UserContext(), zipcode)
 		if err != nil {
-			log.Fatal(err)
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
-		return c.Status(fiber.StatusAccepted).JSON(coordinates)
+		return c.Status(fiber.StatusOK).JSON(coordinates)
 	}
 }
-

@@ -3,7 +3,6 @@ package coordinates
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -27,7 +26,7 @@ func (cc CoordinatesClient) GetCoordinates(ctx context.Context, postalCode strin
 	params.Add("country", "US")
 	params.Add("format", "json")
 
-	slog.InfoContext(ctx, baseUrl+path+"?"+params.Encode())
+	slog.DebugContext(ctx, baseUrl+path+"?"+params.Encode())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseUrl+path+"?"+params.Encode(), nil)
 	if err != nil {
 		slog.ErrorContext(ctx, "Erro ao montar requisição http")
@@ -46,6 +45,6 @@ func (cc CoordinatesClient) GetCoordinates(ctx context.Context, postalCode strin
 		slog.ErrorContext(ctx, "Erro ao serializar resposta")
 		return Coordinates{}, err
 	}
-	fmt.Println(coordinates)
+
 	return coordinates[0], nil
 }
