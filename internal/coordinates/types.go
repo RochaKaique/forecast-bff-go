@@ -7,11 +7,11 @@ import (
 )
 
 type Coordinates struct {
-	latitude  string `json:"lat"`
-	longitude string `json:"lon"`
+	Latitude  string `json:"lat"`
+	Longitude string `json:"lon"`
 }
 
 type CoordinatesClient struct {
-	conf   *viper.Viper
-	client *http.Client
+	Conf   *viper.Viper
+	Client *http.Client
 }

@@ -3,6 +3,7 @@ package coordinates
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -12,37 +13,39 @@ import (
 
 func NewCooordinatesClient(client *http.Client, config *viper.Viper) *CoordinatesClient {
 	return &CoordinatesClient{
-		conf:   config,
-		client: client,
+		Conf:   config,
+		Client: client,
 	}
 }
 
 func (cc CoordinatesClient) GetCoordinates(ctx context.Context, postalCode string) (Coordinates, error) {
-	baseUrl := cc.conf.GetString("coordinates.url")
+	baseUrl := cc.Conf.GetString("coordinates.uri")
 	path := "/search"
 
 	params := url.Values{}
-	params.Add("postalCode", postalCode)
-	params.Add("country", "USA")
-	params.Add("format", "JSON")
+	params.Add("postalcode", postalCode)
+	params.Add("country", "US")
+	params.Add("format", "json")
 
+	slog.InfoContext(ctx, baseUrl+path+"?"+params.Encode())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseUrl+path+"?"+params.Encode(), nil)
 	if err != nil {
 		slog.ErrorContext(ctx, "Erro ao montar requisição http")
 		return Coordinates{}, err
 	}
 
-	resp, err := cc.client.Do(req)
+	resp, err := cc.Client.Do(req)
 	if err != nil {
 		slog.ErrorContext(ctx, "Erro ao realizar requisição http")
 		return Coordinates{}, err
 	}
 	defer resp.Body.Close()
 
-	var coordinates Coordinates
+	var coordinates []Coordinates
 	if err := json.NewDecoder(resp.Body).Decode(&coordinates); err != nil {
+		slog.ErrorContext(ctx, "Erro ao serializar resposta")
 		return Coordinates{}, err
 	}
-
-	return Coordinates{}, nil
+	fmt.Println(coordinates)
+	return coordinates[0], nil
 }
