@@ -63,7 +63,7 @@ func CreateServer(conf *viper.Viper) *Server {
 	coordinatesClient := coordinates.NewCooordinatesClient(httpClient, conf)
 	api := server.app.Group(ContextPath)
 	{
-		api.Get("/:zipcode", forecast.GetForecast(coordinatesClient))
+		api.Get("/:zipcode", forecast.HandleForecast(coordinatesClient))
 	}
 
 	return server

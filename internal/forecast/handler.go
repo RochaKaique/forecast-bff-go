@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetForecast(http *coordinates.CoordinatesClient) fiber.Handler {
+func HandleForecast(http *coordinates.CoordinatesClient) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		zipcode := c.Params("zipcode")
 		coordinates, err := http.GetCoordinates(c.UserContext(), zipcode)
