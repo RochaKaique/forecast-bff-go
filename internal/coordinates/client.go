@@ -29,20 +29,20 @@ func (cc CoordinatesClient) GetCoordinates(ctx context.Context, postalCode strin
 	slog.DebugContext(ctx, baseUrl+path+"?"+params.Encode())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseUrl+path+"?"+params.Encode(), nil)
 	if err != nil {
-		slog.ErrorContext(ctx, "Erro ao montar requisição http")
+		slog.ErrorContext(ctx, "Erro ao montar requisição http", "err", err)
 		return Coordinates{}, err
 	}
 
 	resp, err := cc.Client.Do(req)
 	if err != nil {
-		slog.ErrorContext(ctx, "Erro ao realizar requisição http")
+		slog.ErrorContext(ctx, "Erro ao realizar requisição http", "err", err)
 		return Coordinates{}, err
 	}
 	defer resp.Body.Close()
 
 	var coordinates []Coordinates
 	if err := json.NewDecoder(resp.Body).Decode(&coordinates); err != nil {
-		slog.ErrorContext(ctx, "Erro ao serializar resposta")
+		slog.ErrorContext(ctx, "Erro ao serializar resposta", "err", err)
 		return Coordinates{}, err
 	}
 

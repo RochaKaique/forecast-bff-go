@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/RochaKaique/forecastgo/internal/coordinates"
 	"github.com/RochaKaique/forecastgo/internal/forecast"
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
@@ -60,10 +59,9 @@ func CreateServer(conf *viper.Viper) *Server {
 		port: conf.GetString("server.port"),
 	}
 
-	coordinatesClient := coordinates.NewCooordinatesClient(httpClient, conf)
 	api := server.app.Group(ContextPath)
 	{
-		api.Get("/:zipcode", forecast.HandleForecast(coordinatesClient))
+		api.Get("/:zipcode", forecast.HandleForecast(httpClient, conf))
 	}
 
 	return server

@@ -21,17 +21,31 @@ type ForecastRequest struct {
 }
 
 type ForecastResponse struct {
-	CurrentTemperature  float64           `json:"current_temperature"`
-	HighestTemperature  float64           `json:"highest_temperature"`
-	LowestTemperature   float64           `json:"lowest_temperature"`
-	ApparentTemperature float64           `json:"apparent_temperature"`
-	Precipitation       float64           `json:"precipitation"`
+	CurrentTemperature  float32           `json:"current_temperature"`
+	HighestTemperature  float32           `json:"highest_temperature"`
+	LowestTemperature   float32           `json:"lowest_temperature"`
+	ApparentTemperature float32           `json:"apparent_temperature"`
+	Precipitation       float32           `json:"precipitation"`
 	NextDayForecasts    []NextDayForecast `json:"next_day_forecasts,omitempty"`
 }
 
 type NextDayForecast struct {
 	Date              string  `json:"date"`
-	MinTemperature    float64 `json:"min_temperature"`
-	MaxTemperature    float64 `json:"max_temperature"`
-	PrecipitationProb float64 `json:"precipitation_prob,omitempty"`
+	MinTemperature    float32 `json:"min_temperature"`
+	MaxTemperature    float32 `json:"max_temperature"`
+	PrecipitationProb float32 `json:"precipitation_prob,omitempty"`
+}
+
+type HourlyData struct {
+	Time                []string  `json:"time"`
+	Temperature2M       []float32 `json:"temperature_2m"`
+	ApparentTemperature []float32 `json:"apparent_temperature"`
+	Precipitation       []float32 `json:"precipitation"`
+}
+
+type WeatherDataResponse struct {
+	Latitude  float32    `json:"latitude"`
+	Longitude float32    `json:"longitude"`
+	Elevation float32    `json:"elevation"`
+	Hourly    HourlyData `json:"hourly"`
 }

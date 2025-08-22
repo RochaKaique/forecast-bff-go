@@ -6,3 +6,5 @@ server:
 
 coordinates:
   uri: https://nominatim.openstreetmap.org
+forecast:
+  uri: https://api.open-meteo.com

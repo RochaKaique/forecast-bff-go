@@ -3,6 +3,7 @@ package forecast
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -19,37 +20,52 @@ func NewForecastClient(client *http.Client, config *viper.Viper) *ForecastClient
 	}
 }
 
-func (fc ForecastClient) GetForecast(ctx context.Context, request ForecastRequest) (ForecastResponse, error) {
-	baseUrl := fc.Conf.GetString("forcst.uri")
+func (fc ForecastClient) GetForecast(ctx context.Context, request *ForecastRequest) (ForecastResponse, error) {
+	baseUrl := fc.Conf.GetString("forecast.uri")
 	path := "/v1/forecast"
 	params := request.provideUriParams()
-	slog.DebugContext(ctx, baseUrl+path+params)
+	slog.DebugContext(ctx, "Api de forcast = "+baseUrl+path+params)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseUrl+path+params, nil)
+	req.Header.Set("Accept", "application/json")
 	if err != nil {
-		slog.ErrorContext(ctx, "Erro ao montar requisição http")
+		slog.ErrorContext(ctx, "Erro ao montar requisição http", "err", err)
 		return ForecastResponse{}, err
 	}
 
 	resp, err := fc.Client.Do(req)
 	if err != nil {
-		slog.ErrorContext(ctx, "Erro ao realizar requisição http")
+		slog.ErrorContext(ctx, "Erro ao realizar requisição http", "err", err)
 		return ForecastResponse{}, err
 	}
 	defer resp.Body.Close()
 
-	var forecast ForecastResponse
-	if err := json.NewDecoder(resp.Body).Decode(&forecast); err != nil {
-		slog.ErrorContext(ctx, "Erro ao serializar resposta")
+	if resp.StatusCode != 200 {
+		slog.ErrorContext(ctx, "Resposta da api fora do esperado: "+resp.Status)
+		return ForecastResponse{}, errors.New("Resposta da api fora do esperado")
+	}
+
+	var weather WeatherDataResponse
+	if err := json.NewDecoder(resp.Body).Decode(&weather); err != nil {
+		slog.ErrorContext(ctx, "Erro ao serializar resposta", "err", err)
 		return ForecastResponse{}, err
 	}
 
-	return forecast, nil
+	forecastResponse := ForecastResponse{
+		CurrentTemperature:  weather.ActualTemp(),
+		HighestTemperature:  weather.DayHighestTemp(),
+		LowestTemperature:   weather.DayLowestTemp(),
+		ApparentTemperature: weather.ApparentTemperatureNow(),
+		Precipitation:       weather.PrecipitationNow(),
+		NextDayForecasts:    weather.NextDaysForecast(),
+	}
+
+	return forecastResponse, nil
 }
 
 func (req ForecastRequest) provideUriParams() string {
 
-	var validTempUnits = []string{"celcius", "fahrenheit"}
+	var validTempUnits = []string{"celsius", "fahrenheit"}
 	var validPrecipitationUnits = []string{"mm", "inch"}
 
 	now := time.Now().UTC()
@@ -72,16 +88,20 @@ func (req ForecastRequest) provideUriParams() string {
 	if slices.Contains(validTempUnits, req.TempScale) {
 		tempUnit = req.TempScale
 	} else {
-		tempUnit = "imperial"
+		tempUnit = "fahrenheit"
 	}
 
 	if slices.Contains(validPrecipitationUnits, req.Units) {
-		precipitationUnit = req.Units
+		if req.Units == "metrics" {
+			precipitationUnit = "mm"
+		} else {
+			precipitationUnit = "inch"
+		}
 	} else {
-		tempUnit = "inch"
+		precipitationUnit = "inch"
 	}
 
-	params := fmt.Sprint("?latitude=%s&longitude=%s&hourly=temperature_2m,precipitation,apparent_temperature&start_date=%s&end_date=%s&temperature_unit=%s&precipitation_unit=%s", req.Latitude, req.Longitude, startDt, endDt, tempUnit, precipitationUnit)
+	params := fmt.Sprintf("?latitude=%s&longitude=%s&hourly=temperature_2m,precipitation,apparent_temperature&start_date=%s&end_date=%s&temperature_unit=%s&precipitation_unit=%s", req.Latitude, req.Longitude, startDt, endDt, tempUnit, precipitationUnit)
 
 	return params
 }
