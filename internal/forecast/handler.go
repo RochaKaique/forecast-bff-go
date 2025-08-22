@@ -17,9 +17,9 @@ func HandleForecast(client *http.Client, config *viper.Viper) fiber.Handler {
 		if err != nil {
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
-		
+
 		forecasRequest := &ForecastRequest{
-			Latitude: coordinates.Latitude,
+			Latitude:  coordinates.Latitude,
 			Longitude: coordinates.Longitude,
 			StartDate: c.Query("start_date", ""),
 			EndDate:   c.Query("end_date", ""),
