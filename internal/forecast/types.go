@@ -26,14 +26,14 @@ type ForecastResponse struct {
 	LowestTemperature   float32           `json:"lowest_temperature"`
 	ApparentTemperature float32           `json:"apparent_temperature"`
 	Precipitation       float32           `json:"precipitation"`
-	NextDayForecasts    []NextDayForecast `json:"next_day_forecasts,omitempty"`
+	NextDayForecasts    []NextDayForecast `json:"next_day_forecasts"`
 }
 
 type NextDayForecast struct {
 	Date              string  `json:"date"`
 	MinTemperature    float32 `json:"min_temperature"`
 	MaxTemperature    float32 `json:"max_temperature"`
-	PrecipitationProb float32 `json:"precipitation_prob,omitempty"`
+	PrecipitationProb float32 `json:"precipitation_prob"`
 }
 
 type HourlyData struct {
