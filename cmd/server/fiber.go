@@ -2,10 +2,14 @@ package server
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
+	"github.com/RochaKaique/forecastgo/internal/coordinates"
 	"github.com/RochaKaique/forecastgo/internal/forecast"
+	"github.com/RochaKaique/forecastgo/internal/forecast/handler"
+	"github.com/RochaKaique/forecastgo/internal/forecast/service"
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
@@ -59,9 +63,17 @@ func CreateServer(conf *viper.Viper) *Server {
 		port: conf.GetString("server.port"),
 	}
 
+	coordClient := coordinates.NewCooordinatesClient(httpClient, conf)
+	fcClient    := forecast.NewForecastClient(httpClient, conf)
+
+	log := slog.Default()
+	svc := service.New(coordClient, fcClient, log)
+
 	api := server.app.Group(ContextPath)
+	
 	{
-		api.Get("/:zipcode", forecast.HandleForecast(httpClient, conf))
+		handler.Register(api, svc)
+		// api.Get("/:zipcode", forecast.HandleForecast(httpClient, conf))
 	}
 
 	return server
