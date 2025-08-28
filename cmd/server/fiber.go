@@ -47,7 +47,7 @@ func CreateServer(conf *viper.Viper) *Server {
 		// Opcional: MaxConnsPerHost: 128,
 	}
 	httpClient := &http.Client{
-		Timeout:   2 * time.Second, // timeout total da chamada
+		Timeout:   10 * time.Second, // timeout total da chamada
 		Transport: tr,
 	}
 
@@ -64,16 +64,14 @@ func CreateServer(conf *viper.Viper) *Server {
 	}
 
 	coordClient := coordinates.NewCooordinatesClient(httpClient, conf)
-	fcClient    := forecast.NewForecastClient(httpClient, conf)
+	fcClient := forecast.NewForecastClient(httpClient, conf)
 
 	log := slog.Default()
 	svc := service.New(coordClient, fcClient, log)
 
 	api := server.app.Group(ContextPath)
-	
 	{
-		handler.Register(api, svc)
-		// api.Get("/:zipcode", forecast.HandleForecast(httpClient, conf))
+		api.Get("/:zipcode", handler.Register(api, svc))
 	}
 
 	return server

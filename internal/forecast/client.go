@@ -51,6 +51,8 @@ func (fc ForecastClient) GetForecast(ctx context.Context, request *ForecastReque
 		return ForecastResponse{}, err
 	}
 
+	slog.DebugContext(ctx, "Wheather montado com sucesso")
+
 	forecastResponse := ForecastResponse{
 		CurrentTemperature:  weather.ActualTemp(),
 		HighestTemperature:  weather.DayHighestTemp(),
@@ -59,6 +61,8 @@ func (fc ForecastClient) GetForecast(ctx context.Context, request *ForecastReque
 		Precipitation:       weather.PrecipitationNow(),
 		NextDayForecasts:    weather.NextDaysForecast(),
 	}
+
+	slog.DebugContext(ctx, "Forecast response: "+fmt.Sprint(forecastResponse))
 
 	return forecastResponse, nil
 }
