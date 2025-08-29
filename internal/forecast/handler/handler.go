@@ -25,8 +25,8 @@ func Register(app fiber.Router, svc *service.Service) fiber.Handler {
 
 		out, err := svc.ForecastByZip(c.UserContext(), zipcode, params)
 		if err != nil {
-			slog.ErrorContext(c.UserContext(), "err", err.Error())
-			return c.SendStatus(fiber.StatusBadGateway)
+			slog.ErrorContext(c.UserContext(), "err", err)
+			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 		return c.Status(fiber.StatusOK).JSON(out)
 	}
