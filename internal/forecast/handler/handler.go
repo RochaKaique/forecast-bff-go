@@ -5,15 +5,16 @@ import (
 
 	"log/slog"
 
+	"github.com/RochaKaique/forecastgo/internal/forecast"
 	"github.com/RochaKaique/forecastgo/internal/forecast/service"
 	"github.com/gofiber/fiber/v2"
 )
 
 type ForecastService interface {
-	ForecastByZip(ctx context.Context, zipcode string, qp service.QueryParams) (interface{}, error)
+	ForecastByZip(ctx context.Context, zipcode string, qp service.QueryParams) (forecast.ForecastResponse, error)
 }
 
-func Register(app fiber.Router, svc *service.Service) fiber.Handler {
+func Register(svc *service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		zipcode := c.Params("zipcode")
 		params := service.QueryParams{

@@ -71,7 +71,7 @@ func CreateServer(conf *viper.Viper) *Server {
 
 	api := server.app.Group(ContextPath)
 	{
-		api.Get("/:zipcode", handler.Register(api, svc))
+		api.Get("/:zipcode", handler.Register(svc))
 	}
 
 	return server
