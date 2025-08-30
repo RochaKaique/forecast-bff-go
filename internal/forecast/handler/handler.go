@@ -3,8 +3,6 @@ package handler
 import (
 	"context"
 
-	"log/slog"
-
 	"github.com/RochaKaique/forecastgo/internal/forecast"
 	"github.com/RochaKaique/forecastgo/internal/forecast/service"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +24,6 @@ func Register(svc *service.Service) fiber.Handler {
 
 		out, err := svc.ForecastByZip(c.UserContext(), zipcode, params)
 		if err != nil {
-			slog.ErrorContext(c.UserContext(), "err", err)
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 		return c.Status(fiber.StatusOK).JSON(out)
