@@ -89,7 +89,7 @@ func TestCoordinatesClient_GetCoordinates(t *testing.T) {
 	}
 }
 
-// helper pra injetar config fake
+
 func viperWithURI(uri string) *viper.Viper {
 	v := viper.New()
 	v.Set("coordinates.uri", uri)
