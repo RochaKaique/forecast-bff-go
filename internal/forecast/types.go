@@ -6,9 +6,13 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Doer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type ForecastClient struct {
 	Conf   *viper.Viper
-	Client *http.Client
+	Client Doer
 }
 
 type ForecastRequest struct {

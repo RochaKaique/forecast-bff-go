@@ -1,7 +1,6 @@
 package forecast
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -99,7 +98,6 @@ func max(a, b int) int {
 var now = time.Now
 
 func (w WeatherDataResponse) nowIndexUTC() int {
-	fmt.Println(now().UTC().Truncate(time.Hour).Format(hourLayout))
 	nowUTC := now().UTC().Truncate(time.Hour).Format(hourLayout)
 	for i, ts := range w.Hourly.Time {
 		if ts == nowUTC {

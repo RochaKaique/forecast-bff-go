@@ -50,23 +50,24 @@ func TestDayLowestTemp(t *testing.T) {
 func TestActualTemp(t *testing.T) {
 	t.Parallel()
 
-	fixed := time.Date(2025, 6, 6, 12, 0, 0, 0, time.UTC)
+	fixedTime := time.Date(2025, 6, 6, 12, 0, 0, 0, time.UTC)
 	oldNow := now
-	now = func() time.Time { return fixed }
+	now = func() time.Time { return fixedTime }
 	t.Cleanup(func() { now = oldNow })
 
 	base := time.Date(2025, 6, 6, 0, 0, 0, 0, time.UTC)
 	times := make([]string, 24)
-	temps := make([]float32, 24)
+	actualTemps := make([]float32, 24)
+
 	for i := 0; i < 24; i++ {
 		times[i] = base.Add(time.Duration(i) * time.Hour).Format(hourLayout)
-		temps[i] = float32(i)
+		actualTemps[i] = float32(i)
 	}
 
 	w := WeatherDataResponse{
 		Hourly: HourlyData{
 			Time:          times,
-			Temperature2M: temps,
+			Temperature2M: actualTemps,
 		},
 	}
 
@@ -138,5 +139,4 @@ func TestPrecipitationNow(t *testing.T) {
 	if got != want {
 		t.Fatalf("ActualTemp(): want=%v got=%v", want, got)
 	}
-
 }
